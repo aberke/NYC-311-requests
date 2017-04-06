@@ -58,5 +58,44 @@ https://data.cityofnewyork.us/resource/fhrw-4uyv.json?unique_key=35752674
 
 
 
+## Steps
 
+### Prep training data
+
+	- universal to all data, test and training
+
+	- training data
+
+- drop all samples not yet closed
+- expand features into binary values with pandas.get_dummies
+	- zipcode
+	- agency
+
+
+
+- decide on categories
+	- categorize training data by open_period
+
+- assign categories to training data based on open_period
+
+- decide on model to use
+- train model
+
+- get best features from model
+
+- retrain with these features for linear regression
+
+- maybe use those features for linear regression model
+	- to get more precise closed date
+
+
+
+
+
+### Notes
+
+- Not all people harboring bees are beekeepers
+	- since the start of 2017, there have been 3 unique bee complaints
+	- 2 complaints were closed as of then
+	- these occurred in separate boroughs
 

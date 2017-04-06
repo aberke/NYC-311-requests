@@ -6,6 +6,13 @@
 CLOSED_DATE = "closed_date"
 CREATED_DATE = "created_date"
 
+
+# When reading the data into pandas, read these in as date fields
+READ_AS_DATE_FIELDS = [
+    CLOSED_DATE,
+    CREATED_DATE,
+]
+
 AGENCY = "agency"
 
 # data["agency"].unique()
@@ -31,7 +38,11 @@ AGENCY_VALUES = [
     "NYCEM",
 ]
 
+COMPLAINT_TYPE = "complaint_type"
+
 COMMUNITY_BOARD = "community_board"
+
+
 # from "community_board" key
 COMMUNITY_BOARD_VALUES = [
     "10 QUEENS",
