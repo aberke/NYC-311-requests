@@ -16,8 +16,6 @@ import data
 import transformers
 
 
-
-
 def get_open_periods(data):
     open_periods = []
     for index, data_row in data.iterrows():
@@ -36,8 +34,9 @@ def main():
         - column for each zipcode
         - column for each other thing that is non numerical
         - column for day of the week
-        - column for month name
-        - column for time of day reported   
+        - column for month name 
+
+        - complaint_type
     """
     year_data = load_recent_data()
     # ignore data that has no closed_date
