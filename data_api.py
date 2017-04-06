@@ -9,7 +9,6 @@ from datetime import (
 )
 
 
-import numpy
 import pandas as pd
 import sodapy
 
@@ -75,9 +74,6 @@ def load_data(filepath=None):
     if not filepath:
         filepath = get_data_between_dates()
     # uses index_col so that reading from CSV does not create new unnecessary and unnamed column
-    pd.read_csv(filepath, index_col=0, parse_dates=constants.READ_AS_DATE_FIELDS)
-
-
-
-
+    df = pd.read_csv(filepath, index_col=0, parse_dates=constants.READ_AS_DATE_FIELDS)
+    return df
 

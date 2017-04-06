@@ -4,8 +4,8 @@
 
 import dateutil
 
-import numpy
-import pandas
+import numpy as np
+import pd
 
 import constants
 from cleaners import (
@@ -26,30 +26,30 @@ def transform_test_and_training(df):
     # Expand values into binary features
 
     # Expand agency
-    agency_dummies = pd.get_dummies(df['agency'], axis=1)
-    df = pd.concat(df, agency_dummies)
+    agency_dummies = pd.get_dummies(df['agency'])
+    df = pd.concat([df, agency_dummies], axis=1)
 
     # Clean and expand incident_zip codes
     incident_zip = df.incident_zip.apply(clean_incident_zip)
     zip_dummies = pd.get_dummies(incident_zip, prefix='incident_zip')
-    df = pd.concat(df, zip_dummies, axis=1)
+    df = pd.concat([df, zip_dummies], axis=1)
 
     # Expand by day of the week
     df['created_day_of_week'] = df['created_date'].dt.weekday_name
-    day_of_week_dummies = pdf.get_dummies(df['created_day_of_week'])
-    df = pd.concat([df, day_of_week_dummies])
+    day_of_week_dummies = pd.get_dummies(df['created_day_of_week'])
+    df = pd.concat([df, day_of_week_dummies], axis=1)
 
     # Expand by month
     df['created_month'] = df['created_date'].dt.month
-    month_dummies = pdf.get_dummies(df['created_month'])
-    df = pd.concat([df, month_dummies])
+    month_dummies = pd.get_dummies(df['created_month'], prefix='month')
+    df = pd.concat([df, month_dummies], axis=1)
 
     # Expand complaint type
-    complaint_type_dummies = pd.get_dummies(df[constants.COMPLAINT_TYPE], prefix=constants.COMPLAINT_TYPE)
+    complaint_type_dummies = pd.get_dummies(df['complaint_type'], prefix='complaint_type')
     df = pd.concat([df, complaint_type_dummies], axis=1)
 
     # Expand community board
-    community_board_dummies = pd.get_dummies(df[constants.COMMUNITY_BOARD], prefix=constants.COMMUNITY_BOARD)
+    community_board_dummies = pd.get_dummies(df['community_board'], prefix='community_board')
     df = pd.concat([df, community_board_dummies], axis=1)
 
     return df
@@ -59,30 +59,14 @@ def transform_training_data(df):
     """Applies necessary transformers for training data only """
     df = transform_test_and_training(df)
     
-    # Drop close date -- TODO
+    # TODO
+    # Drop data that has no closed date
+    
+    # Drop data whith invalid closed date where closed_date < created_date
+    
+
     pass
 
-
-
-def agency_to_column_name(agency_value):
-    return "agency:{}".format(agency_value)
-
-
-def data_expand_agency(data):
-    """Expands the 'agency' column for each data row out into a unique
-    column for each unique agency value.
-    New columns have keys 'agency:{agency_value}' and values of 0/1
-
-    Returns (DataFrame) transformed data with a new colunn for each
-    possible agency value.
-    """
-    # Get the 'agency' values for each row as a column vector
-    data_agency_column = data[constants.AGENCY]
-
-    for agency_value in constants.AGENCY_VALUES:
-        column_name = agency_to_column_name(agency_value)
-        data[column_name] = pandas.Series([1 if a == agency_value else 0 for a in data_agency_column])
-    return data
 
 
 def get_open_period(data_row):
