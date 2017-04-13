@@ -36,7 +36,7 @@ client = sodapy.Socrata(DOMAIN, APP_TOKEN)
 
 def load_recent_data(from_date=None):
     """Load data since from_date, which defaults to beginning of 2017.
-    Returns DataFrame representing data.
+    Returns Filepath to data.
     """
     # TODO: put this in a constant?
     from_date = from_date or datetime(year=2017, month=1, day=1)

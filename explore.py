@@ -15,51 +15,16 @@ import data
 import transformers
 
 
-def get_open_periods(data):
-    open_periods = []
-    for index, data_row in data.iterrows():
-        open_period = transformers.get_open_period(data_row)
-        open_periods.append(open_period)
-
-    return pd.Series(open_periods)
-
-
 def main():
+    """ Pipeline for training/testing
     """
-    get_data from this year
-        - drop data without closed_date
-    transform it
-        - column for each agency
-        - column for each zipcode
-        - column for each other thing that is non numerical
-        - column for day of the week
-        - column for month name 
 
-        - complaint_type
-    """
-    year_data = load_recent_data()
-    # ignore data that has no closed_date
-    year_data = year_data.dropna(subset=[constants.CLOSED_DATE])
+    data_filepath = data_api.load_recent_data()
+    df = data_api.load_data(filepath=data_filepath)
+    (X, y) = transformers.get_sample_target_data(df)
 
-    # Apply transformers
-    # Expand agency data
-    transformers.data_expand_agency(data)
+    # split into training/testing
+    # 75/25 training/test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-
-    # Later, when take in one row at a time, can do
-    # row_data = pd.DataFrame([row_data])
-    
     pass
-
-
-
-
-
-
-
-
-
-
-
-
-

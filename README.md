@@ -56,6 +56,20 @@ Example Request to get item by unique key
 https://data.cityofnewyork.us/resource/fhrw-4uyv.json?unique_key=35752674
 
 
+## Time buckets/categories for the classifier
+
+Unit: hours
+- < 1
+- 1-3
+- 3-6
+- 6-12
+- 12-24
+- 24-36
+- 36-48
+- 48-72
+- 72-168 # 3 days to 1 week
+- 168-672 # 1 week to 4 weeks
+- > 672 # More than 4 weeks
 
 
 ## Steps
@@ -66,12 +80,11 @@ https://data.cityofnewyork.us/resource/fhrw-4uyv.json?unique_key=35752674
 
 	- training data
 
-- drop all samples not yet closed
 - expand features into binary values with pandas.get_dummies
-	- zipcode
-	- agency
+    - zipcode
+    - agency
 
-
+- drop all samples not yet closed
 
 - decide on categories
 	- categorize training data by open_period
@@ -80,6 +93,8 @@ https://data.cityofnewyork.us/resource/fhrw-4uyv.json?unique_key=35752674
 
 - decide on model to use
 - train model
+
+    
 
 - get best features from model
 
@@ -93,6 +108,26 @@ https://data.cityofnewyork.us/resource/fhrw-4uyv.json?unique_key=35752674
 
 
 ### Notes
+
+
+- Some requests are closed in less than 2 minutes -- what does this mean?
+    - Most are closed with mesage like "your request was received"
+
+    - (top) 1000s are 'complaint_type' == 'Benefit Card Replacement'  Nearly all records are closed instantaneously
+        - They're all closed wit ha description that the HRA has "received your request..".
+    - 1000's have the complaint_type == 'Derelict Vehicle'
+        -- all closed by the Department of Sanitation
+        - Makes sense: http://www1.nyc.gov/nyc-resources/service/989/abandoned-vehicle
+
+    - 1000's have complaint_type == "Street Light Condition"
+        - All that are closed within 2 mins are assigned to the DOT with "resolution_description" that the "status for this request is available on the DOT website.... " etc
+
+    - Many have complaint_type of "Building/Use"
+        - Most resolution descriptions have the same message that the request has been submitted to the DOB
+
+
+- "Snow" is a Dept of Sanitation agency issue.
+
 
 - Not all people harboring bees are beekeepers
 	- since the start of 2017, there have been 3 unique bee complaints

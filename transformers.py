@@ -12,9 +12,10 @@ from cleaners import (
     clean_incident_zip
 )
 
-def transform_test_and_training(df):
-    """Applies necessary transformers for both test and training data
 
+def common_transformations(df):
+    """ Applies transformations to data frame that are used for all incoming data
+    including training, test, and new data to classify
 
     FLAG: Will scikit learn handle 'sparse vectors' in this way?
     For example, a df with one row will not know about the other columns
@@ -33,14 +34,19 @@ def transform_test_and_training(df):
     zip_dummies = pd.get_dummies(incident_zip, prefix='incident_zip')
     df = pd.concat([df, zip_dummies], axis=1)
 
+    # Expand by time of day
+    df['created_hr_of_day'] = df['created_date'].dt.hour
+    hour_of_day_dummies = pd.get_dummies(df['created_hr_of_day'], prefix='created_hr_of_day')
+    df = pd.concat([df, hour_of_day_dummies], axis=1)
+
     # Expand by day of the week
     df['created_day_of_week'] = df['created_date'].dt.weekday_name
-    day_of_week_dummies = pd.get_dummies(df['created_day_of_week'])
+    day_of_week_dummies = pd.get_dummies(df['created_day_of_week'], prefix='created_day_of_week')
     df = pd.concat([df, day_of_week_dummies], axis=1)
 
     # Expand by month
     df['created_month'] = df['created_date'].dt.month
-    month_dummies = pd.get_dummies(df['created_month'], prefix='month')
+    month_dummies = pd.get_dummies(df['created_month'], prefix='created_month')
     df = pd.concat([df, month_dummies], axis=1)
 
     # Expand complaint type
@@ -51,21 +57,74 @@ def transform_test_and_training(df):
     community_board_dummies = pd.get_dummies(df['community_board'], prefix='community_board')
     df = pd.concat([df, community_board_dummies], axis=1)
 
+    # Drop all of the columns we manipulated or used as interim columns
+    drop_columns = [
+        'agency',
+        'incident_zip',
+        'created_hr_of_day',
+        'created_day_of_week',
+        'created_month',
+        # Created date MUST be dropped, but later
+        'complaint_type',
+        'community_board'
+    ]
+    df.drop(drop_columns, axis=1, inplace=True)
+
     return df
 
 
-def transform_training_data(df):
-    """Applies necessary transformers for training data only """
-    df = transform_test_and_training(df)
+def transform_test_and_training(df):
+    """Applies necessary transformers for both test and training data """
     
-    # TODO
     # Drop data that has no closed date
-    
+    df.dropna(subset=['closed_date'], inplace=True)
+
     # Drop data whith invalid closed date where closed_date < created_date
+    df = df.drop(df[df.closed_date - df.created_date < pd.Timedelta(0)].index)
+
+    df = common_transformations(df)
+
+
+    return df
+
+
+def get_sample_target_data(df):
+    """ Transforms the data as training/target data.
+
+    Returns (X, y)
+    where X is the feature set, y is the target/category
+    """
+
+    df = transform_test_and_training(df)
+
+    # Get a series as a timedelta of open period in hours
+    target_open_hours = (df.closed_date - df.created_date) / pd.Timedelta(hours=1)
+    # Transform that series of hours into labeled categories
+    target_bin_mapping = {
+        1: '< 1 hr',
+        3: '1 - 3 hrs',
+        6: '3 - 6 hrs',
+        12: '6 - 12 hrs',
+        24: '12 - 24 hrs',
+        36: '24 - 36 hrs',
+        48: '36 - 48 hrs',
+        168: '2 - 7 days',
+        672: '1 - 4 weeks',
+        1000000: '> 4 weeks',
+    }
+    target_bins = [0] + list(target_bin_mapping.keys())
+    target_labels = list(target_bin_mapping.values())
+    target = pd.cut(target_open_hours, bins=target_bins, labels=target_labels)
+    y = target
     
+    # Remove from X the closed_dates -- it would ruin testing/training
+    df.drop([
+        'closed_date',
+        'created_date',
+    ], axis=1, inplace=True)
+    X = df
 
-    pass
-
+    return (X, y)
 
 
 def get_open_period(data_row):
