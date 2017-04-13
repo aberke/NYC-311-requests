@@ -16,7 +16,7 @@ def clean_incident_zip(zipcode):
     try:
         zipcode = int(zipcode)
     except:
-        return 0
+        return None
     # Pad it on the left with '0's
     zipcode = '{:05}'.format(zipcode)
     return zipcode

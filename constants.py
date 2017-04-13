@@ -3,6 +3,7 @@
 """
 
 # Column names/Keys
+DUE_DATE = "due_date"
 CLOSED_DATE = "closed_date"
 CREATED_DATE = "created_date"
 
@@ -11,6 +12,7 @@ CREATED_DATE = "created_date"
 READ_AS_DATE_FIELDS = [
     CLOSED_DATE,
     CREATED_DATE,
+    DUE_DATE,
 ]
 
 AGENCY = "agency"

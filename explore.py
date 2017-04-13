@@ -7,8 +7,7 @@ from datetime import (
 )
 
 
-import numpy
-import pandas
+import pandas as pd
 import sodapy
 
 import constants
@@ -22,7 +21,7 @@ def get_open_periods(data):
         open_period = transformers.get_open_period(data_row)
         open_periods.append(open_period)
 
-    return pandas.Series(open_periods)
+    return pd.Series(open_periods)
 
 
 def main():
@@ -48,7 +47,7 @@ def main():
 
 
     # Later, when take in one row at a time, can do
-    # row_data = pandas.DataFrame([row_data])
+    # row_data = pd.DataFrame([row_data])
     
     pass
 
